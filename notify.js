@@ -24,26 +24,36 @@ const { WebClient } = require("@slack/web-api");
       text: { type: "plain_text", text: "Today's Picked Up Items" },
     },
   ];
-  for (const item of pickedItems) {
+  if (pickedItems.length === 0) {
     blocks.push({
       type: "section",
       text: {
-        type: "mrkdwn",
-        text: `*<${item.given_url}|${
-          item.resolved_title ?? item.given_url
-        }>* ( <https://getpocket.com/read/${item.item_id}|Pocket> )`,
+        type: "plain_text",
+        text: "No items.",
       },
     });
-    if (item.excerpt) {
+  } else {
+    for (const item of pickedItems) {
       blocks.push({
         type: "section",
         text: {
-          type: "plain_text",
-          text: `${item.excerpt}...`,
+          type: "mrkdwn",
+          text: `*<${item.given_url}|${
+            item.resolved_title ?? item.given_url
+          }>* ( <https://getpocket.com/read/${item.item_id}|Pocket> )`,
         },
       });
+      if (item.excerpt) {
+        blocks.push({
+          type: "section",
+          text: {
+            type: "plain_text",
+            text: `${item.excerpt}...`,
+          },
+        });
+      }
+      blocks.push({ type: "divider" });
     }
-    blocks.push({ type: "divider" });
   }
 
   const slack = new WebClient(slackAccessToken);
@@ -53,18 +63,20 @@ const { WebClient } = require("@slack/web-api");
     blocks,
   });
 
-  await axios.post(
-    "https://getpocket.com/v3/send",
-    {
-      consumer_key: pocketConsumerKey,
-      access_token: pocketAccessToken,
-      actions: pickedItems.map((item) => ({
-        action: "archive",
-        item_id: item.item_id,
-      })),
-    },
-    {
-      headers: { "content-type": "application/json" },
-    }
-  );
+  if (pickedItems.length > 0) {
+    await axios.post(
+      "https://getpocket.com/v3/send",
+      {
+        consumer_key: pocketConsumerKey,
+        access_token: pocketAccessToken,
+        actions: pickedItems.map((item) => ({
+          action: "archive",
+          item_id: item.item_id,
+        })),
+      },
+      {
+        headers: { "content-type": "application/json" },
+      }
+    );
+  }
 })();
