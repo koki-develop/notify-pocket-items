@@ -29,7 +29,9 @@ const { WebClient } = require("@slack/web-api");
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*<${item.given_url}|${item.resolved_title ?? item.given_url}>*`,
+        text: `*<${item.given_url}|${
+          item.resolved_title ?? item.given_url
+        }>* ( <https://getpocket.com/read/${item.item_id}|Pocket> )`,
       },
     });
     if (item.excerpt) {
