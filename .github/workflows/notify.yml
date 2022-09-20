@@ -3,24 +3,18 @@ name: notify
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: "0 22 * * *"
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-      - name: install dependencies
-        run: yarn install --frozen-lockfile
       - name: notify
-        env:
-          POCKET_ACCESS_TOKEN: ${{ secrets.POCKET_ACCESS_TOKEN }}
-          POCKET_CONSUMER_KEY: ${{ secrets.POCKET_CONSUMER_KEY }}
-          SLACK_ACCESS_TOKEN: ${{ secrets.SLACK_ACCESS_TOKEN }}
-        run: node ./notify.js
+        uses: koki-develop/push-pocket-action@main
+        with:
+          slack-channel-id: "#feeds"
+          slack-access-token: ${{ secrets.SLACK_ACCESS_TOKEN }}
+          pocket-consumer-key: ${{ secrets.POCKET_CONSUMER_KEY }}
+          pocket-access-token: ${{ secrets.POCKET_ACCESS_TOKEN }}
+          count: 3
+          archive: true
