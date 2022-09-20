@@ -45,9 +45,24 @@ const { WebClient } = require("@slack/web-api");
   }
 
   const slack = new WebClient(slackAccessToken);
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: "#feeds",
     text: "Today's Picked Up Items",
     blocks,
   });
+
+  await axios.post(
+    "https://getpocket.com/v3/send",
+    {
+      consumer_key: pocketConsumerKey,
+      access_token: pocketAccessToken,
+      actions: pickedItems.map((item) => ({
+        action: "archive",
+        item_id: item.item_id,
+      })),
+    },
+    {
+      headers: { "content-type": "application/json" },
+    }
+  );
 })();
