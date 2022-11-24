@@ -9,7 +9,7 @@ jobs:
   pocket:
     runs-on: ubuntu-latest
     steps:
-      - uses: koki-develop/push-pocket-action@v1.0.0
+      - uses: koki-develop/push-pocket-action@v1.1.0
         with:
           slack-channel-id: "#feeds"
           slack-access-token: ${{ secrets.SLACK_ACCESS_TOKEN }}
